@@ -1,10 +1,11 @@
 import math
 import random
 import typing
-import constants
 import matplotlib.pyplot as plt
 
-from algoritms import Alghoritm
+from command_helper import BarCommand
+from matplot_visualizer import constants
+from alghoritms.algoritms import Alghoritm
 from collections import deque
 from matplotlib import rc
 from matplotlib import container
@@ -26,7 +27,9 @@ class Frames:
         frame_size = math.log2(count_alg) or 1
         frame_size = (round(frame_size + 0.5), int(frame_size))
         data_set = Frames.generate_data_set()
+        print(Frames.get_sub_classes())
         for indx, sub_class in enumerate(Frames.get_sub_classes()):
+            print(indx)
             axes = FIGURE.add_subplot(
                 frame_size[0],
                 frame_size[1],
@@ -50,7 +53,7 @@ class Frames:
                 'Algh': sub_class
             })
 
-            return [frame.get('Axes') for frame in Frames.FRAMES]
+        return [frame.get('Axes') for frame in Frames.FRAMES]
 
     @staticmethod
     def generate_data_set():
@@ -63,45 +66,6 @@ class Frames:
     @staticmethod
     def get_sub_classes():
         return Alghoritm.__subclasses__()
-
-class BarCommand:
-
-    @staticmethod
-    def execute_command(
-        command: str,
-        bar_cont: container.BarContainer,
-        *args,
-        **kwargs
-    ):
-        COMMANDS = {
-            'Swap': BarCommand.swap_bars,
-            'Colorized': BarCommand.mark_bar_color
-        }
-
-        method = COMMANDS.get(command)
-
-        if not method:
-            Warning(f'Указанный метод {method} не реализован.')
-            return
-
-        return method(bar_cont, *args, **kwargs)
-
-    @staticmethod
-    def swap_bars(
-        bar_cont: container.BarContainer,
-        left_bar_index: int,
-        right_bar_index: int,
-        **kwargs
-    ) -> None:
-        temp_heigt = bar_cont[left_bar_index]._height
-        bar_cont[left_bar_index].set_height(bar_cont[right_bar_index]._height)
-        bar_cont[right_bar_index].set_height(temp_heigt)
-
-    @staticmethod
-    def mark_bar_color(bar_cont: container.BarContainer, *args, **kwargs):
-        for i in [*args]:
-            print({**kwargs}.get('color'))
-            bar_cont[i].set_color({**kwargs}.get('color'))
 
 
 def animations(main_figure: plt.Figure):
@@ -148,8 +112,7 @@ def animations(main_figure: plt.Figure):
     plt.show()
 
 
-if __name__ == '__main__':
-    FIGURE.canvas.toolbar.pack_forget()
-    FIGURE.set(facecolor=constants.FACECOLOR)
-    rc('axes', edgecolor=constants.BAR_BORDER_COLOR)
-    animations(FIGURE)
+FIGURE.canvas.toolbar.pack_forget()
+FIGURE.set(facecolor=constants.FACECOLOR)
+rc('axes', edgecolor=constants.BAR_BORDER_COLOR)
+animations(FIGURE)
