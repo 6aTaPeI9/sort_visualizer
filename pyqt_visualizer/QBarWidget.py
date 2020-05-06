@@ -16,12 +16,12 @@ class Bar:
 
 
 class QBar(QWidget):
-    def __init__(self, bars: list, titile = ''):
+    def __init__(self, bars: list, titile = 'test'):
         super().__init__()
-        self.setMinimumSize(150, 150)
         self.bars = []
         self.titile = titile
         self.padding = 0.1
+        self.total_count = 0
 
         for bar in bars:
             self.bars.append(Bar(bar))
@@ -69,5 +69,6 @@ class QBar(QWidget):
             )
 
         qp.drawText((width / 2) + (text_space / 6), 7 , self.titile)
+        qp.drawText(width / 25, height / 10 , f'Total operations: {self.total_count}')
 
         return
