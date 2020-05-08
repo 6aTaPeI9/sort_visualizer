@@ -5,7 +5,8 @@ import random
 from command_helper import BarCommand
 from pyqt_visualizer import QBarWidget
 from alghoritms.algoritms import Alghoritm
-from PyQt5.QtWidgets import QWidget, QMainWindow, QVBoxLayout, QHBoxLayout, QStackedLayout, QGridLayout, QPushButton, QSlider, QLabel
+from PyQt5.QtWidgets import (QWidget, QMainWindow, QVBoxLayout, QHBoxLayout,
+    QStackedLayout, QGridLayout, QPushButton, QSlider, QLabel, QCheckBox)
 from PyQt5.QtCore import QObject, Qt, pyqtSignal, pyqtSlot, QThread, QTimer
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen, QPalette
 
@@ -28,7 +29,9 @@ class MainWindow(QMainWindow):
         super().__init__(*args, **kwargs)
         self.setMinimumSize(900, 450)
         self.bars = []
+        self.selected_algh = {}
         self.Ended = False
+        self.stoped = False
         self.count_bar_items = 100
         self.setWindowTitle('Test layouts')
         self.InitWindowGrid()
@@ -89,6 +92,13 @@ class MainWindow(QMainWindow):
         v_right_layout.addWidget(self.lcd)
         v_right_layout.addWidget(sld)
 
+        for i, sub_class in enumerate(self.get_alghoritms()):
+            ch_box = QCheckBox(sub_class.NAME, self)
+            ch_box.setStyleSheet('color: white')
+            self.selected_algh[sub_class.NAME] = False
+            ch_box.stateChanged.connect(self.add_q_box_signal(i, sub_class.NAME))
+            v_right_layout.addWidget(ch_box)
+
         v_right_layout.addWidget(self.lb_speed)
         v_right_layout.addWidget(sld_speed)
         v_right_layout.addWidget(QWidget())
@@ -113,6 +123,38 @@ class MainWindow(QMainWindow):
         self.main_layout = gr_layout
         self.setCentralWidget(widget)
 
+    def add_q_box_signal(self, i: int, name):
+        """
+            Метод генерирует методы для колбека от чекбоксов
+        """
+        def q_box_changed(checked, name: str = name):
+            self.selected_algh[name] = bool(checked)
+
+        q_box_changed.__name__ = f'q_box_changed{i}'
+        setattr(self, q_box_changed.__name__, q_box_changed)
+        return getattr(self, q_box_changed.__name__)
+
+
+    def get_alghoritms(self, names: list = None) -> list:
+        """
+            Метод возвращает все унаследованные классы от класса Alghoritm.
+            :param name: список значений атрибута NAME для которых нужно вернуть их классы
+        """
+        sub_classes = Alghoritm.__subclasses__()
+
+        if not names:
+            return sub_classes
+
+        res = []
+        for sub_class in Alghoritm.__subclasses__():
+            if not hasattr(sub_class, 'NAME'):
+                continue
+
+            if sub_class.NAME in names:
+                res.append(sub_class)
+
+        return res
+
 
     def set_timer_interval(self, value):
         """
@@ -120,7 +162,6 @@ class MainWindow(QMainWindow):
             интервал для таймера
         """
         value = round(value / 100, 2)
-        print(value)
         self.timer.start(value)
         self.lb_speed.setText(f'Шаг каждые: {value}(мс.)')
         self.lb_speed.adjustSize()
@@ -131,7 +172,6 @@ class MainWindow(QMainWindow):
             Метод получает текущее значение ползунка, устанавливает
             требуемое кол-во колонов в гистограмме и обновляет лейбл.
         """
-        print(value)
         self.count_bar_items = value
         self.lcd.setText(f'Кол-во эл.: {value}')
         self.lcd.adjustSize()
@@ -228,6 +268,7 @@ class MainWindow(QMainWindow):
             алгоритма сортировки.
         """
         self.bars.clear()
+        no_one_bar = True
 
         subclasses = Alghoritm.__subclasses__()
 
@@ -235,6 +276,9 @@ class MainWindow(QMainWindow):
         data_set = self.generate_data_set(99, self.count_bar_items)
         row, col = 0, 0
         for alghoritm in subclasses:
+            if not self.selected_algh.get(alghoritm.NAME):
+                continue
+
             bar = QBarWidget.QBar(data_set.copy())
             self.main_layout.addWidget(bar, row, col)
 
@@ -249,3 +293,8 @@ class MainWindow(QMainWindow):
                 'QBar': bar,
                 'Algh': alghoritm
             })
+
+            no_one_bar = False
+
+        if no_one_bar:
+            self.main_layout.addWidget(QWidget())
