@@ -6,8 +6,9 @@ class Alghoritm:
 
 
 class BubleSort(Alghoritm):
+    NAME = 'Bubble Sort'
+
     def __init__(self, data: list):
-        self.name = ''
         self.data = data
         self.end = False
         self.algh_gen = self.algh()
@@ -44,8 +45,9 @@ class BubleSort(Alghoritm):
 
 
 class LineSort(Alghoritm):
+    NAME = 'Selection Sort'
+
     def __init__(self, data: list):
-        self.name = ''
         self.data = data
         self.end = False
         self.algh_gen = self.algh()
@@ -79,3 +81,4 @@ class LineSort(Alghoritm):
             return result
         except StopIteration:
             return None
+
