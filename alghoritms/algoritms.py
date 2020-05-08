@@ -6,7 +6,7 @@ class Alghoritm:
 
 
 class BubleSort(Alghoritm):
-    NAME = 'Bubble Sort'
+    NAME = 'Bubble'
 
     def __init__(self, data: list):
         self.data = data
@@ -44,8 +44,8 @@ class BubleSort(Alghoritm):
             return None
 
 
-class LineSort(Alghoritm):
-    NAME = 'Selection Sort'
+class ShakeSort(Alghoritm):
+    NAME = 'Shake'
 
     def __init__(self, data: list):
         self.data = data
@@ -53,21 +53,40 @@ class LineSort(Alghoritm):
         self.algh_gen = self.algh()
 
     def algh(self):
-        for i in range(len(self.data)):
-            for j in range(len(self.data)):
+        data_range = len(self.data) - 1
+        for i in range(data_range):
+            swapped = False
+            for j in range(i, data_range - i, 1):
                 yield {
-                    'Position': (i, j),
+                    'Position': (j, j+1),
                     'Command': 'Colorized'
                 }
 
-                if self.data[i] < self.data[j]:
+                if self.data[j] > self.data[j + 1]:
                     yield {
-                        'Position': (i, j),
+                        'Position': (j, j+1),
                         'Command': 'Swap'
                     }
-                    self.data[i], self.data[j] = self.data[j], self.data[i]
-                else:
-                    continue
+                    print('Data1', self.data)
+                    self.data[j], self.data[j + 1] = self.data[j + 1], self.data[j]
+                    swapped = True
+
+            for j in range(data_range - i, i, -1):
+                yield {
+                    'Position': (j - 1, j),
+                    'Command': 'Colorized'
+                }
+                if self.data[j - 1] > self.data[j]:
+                    yield {
+                        'Position': (j - 1, j),
+                        'Command': 'Swap'
+                    }
+                    self.data[j - 1], self.data[j] = self.data[j], self.data[j - 1]
+                    swapped = True
+
+            if not swapped:
+                return
+
 
     @lru_cache(maxsize=24)
     def get_pos_history(self, iteratin_index: int):
@@ -81,4 +100,3 @@ class LineSort(Alghoritm):
             return result
         except StopIteration:
             return None
-
