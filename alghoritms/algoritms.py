@@ -168,3 +168,47 @@ class CombSort(Alghoritm):
             return result
         except StopIteration:
             return None
+
+
+class QuickSort(Alghoritm):
+    NAME = 'Quick'
+    GROUP = 'Comparisons'
+
+    def __init__(self, data: list):
+        self.data = data
+        self.end = False
+        self.algh_gen = self.algh(0, len(self.data) - 1)
+
+    def algh(self, start, end):
+        if start >= end:
+            return
+
+        pivot = self.data[end]
+        pivotIdx = start
+
+        for i in range(start, end):
+            yield {'Position': (i, pivotIdx), 'Command': 'Colorized'}
+            if self.data[i] < pivot:
+                yield {'Position': (i, pivotIdx), 'Command': 'Swap'}
+                self.data[i], self.data[pivotIdx] = self.data[pivotIdx], self.data[i]
+                pivotIdx += 1
+
+        yield {'Position': (end, pivotIdx), 'Command': 'Swap'}
+        self.data[end], self.data[pivotIdx] = self.data[pivotIdx], self.data[end]
+
+        yield from self.algh(start, pivotIdx - 1)
+        yield from self.algh(pivotIdx + 1, end)
+
+
+    @lru_cache(maxsize=24)
+    def get_pos_history(self, iteratin_index: int):
+        """
+            Метод возвращает позиции столбцов для следующей отрисовки.
+            :param iteratin_index: параметр для попадения метода в кэш и
+            возможности получения истории итерации.
+        """
+        try:
+            result = self.algh_gen.__next__()
+            return result
+        except StopIteration:
+            return None

@@ -100,11 +100,11 @@ class MainWindow(QMainWindow):
             self.selected_algh[sub_class.NAME] = False
             ch_box.stateChanged.connect(self.add_q_box_signal(i, sub_class.NAME))
 
-            if row >= 2:
-                row = 0
-                col += 1
+            if col >= 2:
+                row += 1
+                col = 0
             q_grid_boxes.addWidget(ch_box, row, col)
-            row += 1
+            col += 1
 
         v_right_layout.addLayout(q_grid_boxes)
         v_right_layout.addWidget(self.lb_speed)
