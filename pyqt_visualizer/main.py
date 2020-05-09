@@ -3,7 +3,7 @@ import time
 import random
 
 from command_helper import BarCommand
-from pyqt_visualizer import QBarWidget
+from pyqt_visualizer import QBarWidget, constants
 from alghoritms.algoritms import Alghoritm
 from PyQt5.QtWidgets import (QWidget, QMainWindow, QVBoxLayout, QHBoxLayout,
     QStackedLayout, QGridLayout, QPushButton, QSlider, QLabel, QCheckBox)
@@ -27,13 +27,13 @@ class WorkerThread(QObject):
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setMinimumSize(900, 450)
+        self.setMinimumSize(constants.DEF_WIDTH, constants.DEF_HEIGTH)
         self.bars = []
         self.selected_algh = {}
         self.Ended = False
-        self.stoped = False
-        self.count_bar_items = 100
-        self.setWindowTitle('Test layouts')
+        self.stoped = True
+        self.count_bar_items = constants.DEF_BARS_COUNT
+        self.setWindowTitle('Sort alghoritms')
         self.InitWindowGrid()
         self.show()
 
@@ -48,7 +48,7 @@ class MainWindow(QMainWindow):
 
         self.timer = QTimer(self)
         self.timer.setSingleShot(False)
-        self.timer.setInterval(0.05)
+        self.timer.setInterval(constants.DEF_TIMEOUT / 100)
         self.timer.timeout.connect(self.signal)
 
         h_layout_main = QHBoxLayout()
@@ -68,10 +68,10 @@ class MainWindow(QMainWindow):
         gr_layout.setSpacing(20)
         gr_layout.addWidget(QWidget())
 
-        self.lcd = QLabel('Кол-во эл.: 100', self)
+        self.lcd = QLabel(f'Кол-во эл.: {self.count_bar_items}', self)
         self.lcd.setStyleSheet('color: white')
 
-        self.lb_speed = QLabel('Шаг каждые: 0.05(мс)')
+        self.lb_speed = QLabel(f'Шаг каждые: {constants.DEF_TIMEOUT / 1000}(мс)')
         self.lb_speed.setStyleSheet('color: white')
 
         sld = QSlider(Qt.Horizontal, self)
@@ -86,30 +86,31 @@ class MainWindow(QMainWindow):
         sld_speed.setMinimum(1)
         sld_speed.setMaximum(100000)
         sld_speed.setSingleStep(1)
-        sld_speed.setValue(5)
+        sld_speed.setValue(constants.DEF_TIMEOUT)
 
         v_right_layout.addLayout(h_right_layout)
         v_right_layout.addWidget(self.lcd)
         v_right_layout.addWidget(sld)
 
+        q_grid_boxes = QGridLayout()
+        row, col = 0, 0
         for i, sub_class in enumerate(self.get_alghoritms()):
             ch_box = QCheckBox(sub_class.NAME, self)
             ch_box.setStyleSheet('color: white')
             self.selected_algh[sub_class.NAME] = False
             ch_box.stateChanged.connect(self.add_q_box_signal(i, sub_class.NAME))
-            v_right_layout.addWidget(ch_box)
 
+            if row >= 2:
+                row = 0
+                col += 1
+            q_grid_boxes.addWidget(ch_box, row, col)
+            row += 1
+
+        v_right_layout.addLayout(q_grid_boxes)
         v_right_layout.addWidget(self.lb_speed)
         v_right_layout.addWidget(sld_speed)
-        v_right_layout.addWidget(QWidget())
-        v_right_layout.addWidget(QWidget())
-        v_right_layout.addWidget(QWidget())
-        v_right_layout.addWidget(QWidget())
-        v_right_layout.addWidget(QWidget())
-        v_right_layout.addWidget(QWidget())
-        v_right_layout.addWidget(QWidget())
-        v_right_layout.addWidget(QWidget())
-        v_right_layout.addWidget(QWidget())
+        v_right_layout.addWidget(QWidget(), 5)
+
 
         h_layout_main.addLayout(gr_layout, 5)
         h_layout_main.addLayout(v_right_layout, 1)
@@ -122,6 +123,7 @@ class MainWindow(QMainWindow):
         widget.setLayout(h_layout_main)
         self.main_layout = gr_layout
         self.setCentralWidget(widget)
+
 
     def add_q_box_signal(self, i: int, name):
         """
@@ -182,11 +184,13 @@ class MainWindow(QMainWindow):
             Метод возобнавляет визуалицаю сортировки.
             Если визуализация уже была завершена, метод запустит ее заново.
         """
-        if self.Ended:
+        if not self.stoped or self.Ended:
+            self.signal(drop_iter=True)
             self.clear_bars()
-            self.Ended = False
             self.create_bars()
 
+        self.stoped = False
+        self.Ended = False
         self.timer.start()
 
 
@@ -194,13 +198,18 @@ class MainWindow(QMainWindow):
         """
             Метод приостанавливает визуализацию сортировки.
         """
+        self.stoped = True
         self.timer.stop()
 
 
-    def signal(self, iter_index = [0]):
+    def signal(self, iter_index = [0], drop_iter: bool = False):
         """
             Метод получает сигнал из таймера и перерисовывает все гистограммы.
         """
+        if drop_iter:
+            iter_index[0] = 0
+            return
+
         all_ended = True
         for bar in self.bars:
 
@@ -255,11 +264,11 @@ class MainWindow(QMainWindow):
 
 
     def clear_bars(self):
+        """
+            Метод очищает основной макет от всех виджетов, для последующей перерисовки
+        """
         for i in reversed(range(self.main_layout.count())):
             self.main_layout.itemAt(i).widget().setParent(None)
-        # for bar in self.bars:
-        #     self.main_layout.removeWidget(bar.get('QBar'))
-        #     bar.get('QBar').deleteLater()
 
 
     def create_bars(self) -> None:
