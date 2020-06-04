@@ -9,7 +9,8 @@ class BarCommand:
     ):
         COMMANDS = {
             'Swap': BarCommand.swap_bars,
-            'Colorized': BarCommand.mark_bar_color
+            'Colorized': BarCommand.mark_bar_color,
+            'Insert': BarCommand.insert_val
         }
 
         method = COMMANDS.get(command)
@@ -35,3 +36,12 @@ class BarCommand:
     def mark_bar_color(bar_cont: object, *args, **kwargs):
         for i in [*args]:
             bar_cont[i].set_color({**kwargs}.get('color'))
+
+    @staticmethod
+    def insert_val(
+        bar_cont: object,
+        left_bar_index: int,
+        **kwargs
+    ):
+        print({**kwargs}.get('color'))
+        bar_cont[left_bar_index].set_height({**kwargs}.get('value'))

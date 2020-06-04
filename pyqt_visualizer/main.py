@@ -10,6 +10,11 @@ from PyQt5.QtCore import QObject, Qt, pyqtSignal, pyqtSlot, QThread
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen, QPalette
 
 
+COLOR_LINKS = {
+    'green': Qt.green,
+    'red': Qt.red
+}
+
 class WorkerThread(QObject):
     signal = pyqtSignal()
 
@@ -77,7 +82,8 @@ class MainWindow(QMainWindow):
                 selected.get('Command'),
                 bar_cont,
                 *selected.get('Position'),
-                color=Qt.red
+                color=COLOR_LINKS.get(selected.get('Color')) or Qt.red,
+                value=selected.get('Value')
             )
 
             bar_cont.update()
