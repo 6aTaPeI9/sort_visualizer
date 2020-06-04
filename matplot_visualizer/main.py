@@ -27,9 +27,8 @@ class Frames:
         frame_size = math.log2(count_alg) or 1
         frame_size = (round(frame_size + 0.5), int(frame_size))
         data_set = Frames.generate_data_set()
-        print(Frames.get_sub_classes())
+
         for indx, sub_class in enumerate(Frames.get_sub_classes()):
-            print(indx)
             axes = FIGURE.add_subplot(
                 frame_size[0],
                 frame_size[1],
