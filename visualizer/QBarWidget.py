@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+    Модуль содрежит реализацию веджета для графика
+"""
+
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QFont, QColor

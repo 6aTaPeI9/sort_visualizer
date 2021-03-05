@@ -1,9 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+    Инциализация основного окна и управление им
+"""
+
 import math
 import time
 import random
 
 from command_helper import BarCommand
-from pyqt_visualizer import QBarWidget, constants
+from visualizer import QBarWidget, constants
 from alghoritms.algoritms import Alghoritm
 from PyQt5.QtWidgets import (QWidget, QMainWindow, QVBoxLayout, QHBoxLayout,
     QStackedLayout, QGridLayout, QPushButton, QSlider, QLabel, QCheckBox)
@@ -44,12 +49,6 @@ class MainWindow(QMainWindow):
 
 
     def InitWindowGrid(self):
-        # self.worker = WorkerThread()
-        # self.workerThread = QThread()
-        # self.workerThread.started.connect(self.worker.run)
-        # self.worker.signal.connect(self.signal)
-        # self.worker.moveToThread(self.workerThread)
-        # self.workerThread.start()
 
         self.timer = QTimer(self)
         self.timer.setSingleShot(False)

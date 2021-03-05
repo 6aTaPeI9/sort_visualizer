@@ -1,6 +1,0 @@
-FACECOLOR = 'black'
-BAR_COLOR = 'white'
-SELECTED_COLOR = 'red'
-BAR_BORDER_COLOR = 'gray'
-BAR_XMARGIN = 0
-MAX_HEIGHT = 99

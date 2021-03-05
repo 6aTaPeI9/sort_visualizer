@@ -1,5 +1,4 @@
 class BarCommand:
-
     @staticmethod
     def execute_command(
         command: str,
@@ -43,5 +42,4 @@ class BarCommand:
         left_bar_index: int,
         **kwargs
     ):
-        print({**kwargs}.get('color'))
         bar_cont[left_bar_index].set_height({**kwargs}.get('value'))
