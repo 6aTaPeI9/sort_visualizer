@@ -1,2 +1,2 @@
-python3.7
-matplotlib 3.2.1
+python==3.7
+PyQt5==5.15.2
